@@ -353,9 +353,13 @@ def read_json(p: Path) -> tuple[dict, str]:
 
 
 def project_dir(start: Path) -> Path:
-    """cwd if it has a .claude/, else the nearest ancestor with one, else cwd."""
+    """cwd if it has a .claude/, else the nearest ancestor with one up to the git root, else cwd.
+    Never climbs into the home directory: ~/.claude is user config, not a project."""
     start = start.resolve()
+    home = Path.home().resolve()
     for p in [start, *start.parents]:
+        if p == home and p != start:
+            break
         if (p / ".claude").is_dir():
             return p
         if (p / ".git").exists():
