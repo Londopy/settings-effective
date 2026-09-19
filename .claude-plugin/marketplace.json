@@ -1,0 +1,17 @@
+{
+  "name": "settings-effective",
+  "owner": {
+    "name": "Londopy",
+    "url": "https://github.com/Londopy"
+  },
+  "description": "Marketplace for the settings-effective plugin.",
+  "plugins": [
+    {
+      "name": "settings-effective",
+      "source": "./",
+      "description": "Merged Claude Code settings with the file that decided each key, plus why a setting is not applying.",
+      "version": "1.0.0",
+      "keywords": ["claude-code", "settings", "permissions", "hooks", "precedence"]
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "name": "settings-effective",
+  "displayName": "Settings Effective",
+  "version": "1.0.0",
+  "description": "The merged Claude Code settings actually in effect, with the file that decided each key, and the reasons a setting is not applying: wrong-scope file, shadowed value, outranked permission rule, typo, skipped file.",
+  "author": {
+    "name": "Londopy",
+    "url": "https://github.com/Londopy"
+  },
+  "homepage": "https://github.com/Londopy/settings-effective",
+  "repository": "https://github.com/Londopy/settings-effective",
+  "license": "MIT",
+  "keywords": ["claude-code", "settings", "settings.json", "permissions", "hooks", "precedence", "diagnostics", "plugin"]
+}

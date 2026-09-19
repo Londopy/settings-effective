@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    name: ${{ matrix.os }} / py${{ matrix.python }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python: ["3.10", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Unit tests
+        run: python -m unittest discover -s tests -v
+      - name: Index parses from a saved copy of the docs page
+        run: python docs/update_index.py docs/settings-reference.snapshot.md && git diff --exit-code --stat
+      - name: Report runs on an empty machine
+        run: python skills/settings-effective/scripts/effective.py --claude-home ./.no-home --managed-dir ./.no-managed --claude-json ./.no.json --strict
