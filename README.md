@@ -13,6 +13,8 @@
 
 <img src="docs/demo.png" alt="settings-effective output: the six layers, each effective key with its source, and the findings that explain a setting that is not applying" width="900">
 
+<sub>Part of the rollcall family — tools that make what Claude Code does silently legible: [skill-rollcall](https://github.com/Londopy/skill-rollcall) · [mcp-rollcall](https://github.com/Londopy/mcp-rollcall) · **settings-effective** · [git-attribution](https://github.com/Londopy/git-attribution)</sub>
+
 </div>
 
 ---
