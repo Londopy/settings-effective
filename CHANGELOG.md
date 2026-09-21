@@ -6,6 +6,8 @@
   ran under (from `CLAUDECODE`, `CODEX_SANDBOX`, `CURSOR_AGENT`, `GEMINI_CLI`) and, under
   Codex, Cursor or Gemini, saying that their own config is a different merge this tool
   does not read. The subject stays Claude Code's settings. JSON gains `host`, `host_note`.
+- `docs/update_index.py` keeps `INDEX_DATE` when the parsed index is unchanged, so the CI
+  step that re-parses the docs snapshot passes on any day, not only the day it was generated.
 - SKILL.md rewritten with a "Which host" section and the Agent Skills spec frontmatter
   (`license`, `compatibility`, `metadata`); `agents/openai.yaml` for Codex / ChatGPT UI
   metadata; README install matrix for Codex, Cursor, Gemini CLI, Copilot and OpenCode.
