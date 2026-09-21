@@ -34,7 +34,7 @@ def write(p: Path, data) -> None:
 
 
 def fixture(tmp: Path) -> dict:
-    home, managed, proj, cj = tmp / "home", tmp / "managed", tmp / "Code" / "nexium", tmp / "claude.json"
+    home, managed, proj, cj = tmp / "home", tmp / "managed", tmp / "Code" / "tidewatch", tmp / "claude.json"
     write(home / "settings.json", {
         "model": "opus", "attribution": {"commit": "", "pr": ""},
         "permissions": {"allow": ["Bash(git status)", "Bash(npm test)"], "defaultMode": "acceptEdits"},
