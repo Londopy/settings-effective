@@ -2,18 +2,19 @@
 
 # 🧭 settings-effective
 
-**The Claude Code settings actually in effect — every key, and which file decided it. Plus the reasons the one you set isn't.**
+**The Claude Code settings actually in effect — every key, and which file decided it. Plus the reasons the one you set isn't. Runs from Claude Code, Codex, Cursor or any Agent Skills host.**
 
 [![CI](https://github.com/Londopy/settings-effective/actions/workflows/ci.yml/badge.svg)](https://github.com/Londopy/settings-effective/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![Dependencies: none](https://img.shields.io/badge/dependencies-none-brightgreen)](skills/settings-effective/scripts/effective.py)
-[![Claude Code plugin](https://img.shields.io/badge/Claude_Code-plugin-D97757?logo=anthropic&logoColor=white)](https://code.claude.com/docs/en/plugins)
+[![Agent Skills](https://img.shields.io/badge/Agent_Skills-spec-111)](https://agentskills.io)
+[![Runs from](https://img.shields.io/badge/runs_from-Claude_Code_%7C_Codex_%7C_Cursor_%7C_Gemini_CLI_%7C_Copilot_%7C_OpenCode-D97757)](#install)
 [![Platform](https://img.shields.io/badge/platform-windows%20%7C%20macos%20%7C%20linux-lightgrey)](#install)
 
 <img src="docs/demo.png" alt="settings-effective output: the six layers, each effective key with its source, and the findings that explain a setting that is not applying" width="900">
 
-<sub>Part of the rollcall family — tools that make what Claude Code does silently legible: [skill-rollcall](https://github.com/Londopy/skill-rollcall) · [mcp-rollcall](https://github.com/Londopy/mcp-rollcall) · **settings-effective** · [git-attribution](https://github.com/Londopy/git-attribution)</sub>
+<sub>Part of the rollcall family — tools that make what your coding agent does silently legible: [skill-rollcall](https://github.com/Londopy/skill-rollcall) · [mcp-rollcall](https://github.com/Londopy/mcp-rollcall) · **settings-effective** · [git-attribution](https://github.com/Londopy/git-attribution) · all four: [agent-skills](https://github.com/Londopy/agent-skills)</sub>
 
 </div>
 
@@ -38,12 +39,14 @@ Read-only, always.
 
 ## Install
 
-Pick whichever fits how you manage skills; all three produce the same result.
+One layout — `skills/settings-effective/SKILL.md` + `scripts/effective.py` — is the [Agent Skills](https://agentskills.io) standard, so the same folder works in every host. The subject is always Claude Code's settings; a machine that runs several agents still has one Claude Code configuration to debug, and this reads it from whichever agent you're in.
 
-**`skills` CLI** (global; `--copy` because symlinks need Developer Mode on Windows):
+**`skills` CLI** — any of 79 agents (global; `--copy` because symlinks need Developer Mode on Windows):
 
 ```bash
-npx skills add Londopy/settings-effective -g --copy
+npx skills add Londopy/settings-effective -g --copy                  # picks the agents it finds
+npx skills add Londopy/settings-effective -g --copy -a codex -a cursor
+npx skills add Londopy/settings-effective -g --copy --all            # every agent, no prompts
 ```
 
 **Claude Code plugin** (in an interactive `claude` session):
@@ -53,22 +56,27 @@ npx skills add Londopy/settings-effective -g --copy
 /plugin install settings-effective@settings-effective
 ```
 
-**By hand:**
+**By hand** — copy the folder into the host's skills directory:
 
 ```bash
 git clone https://github.com/Londopy/settings-effective
-cp -r settings-effective/skills/settings-effective ~/.claude/skills/
+cp -r settings-effective/skills/settings-effective ~/.claude/skills/          # Claude Code
+cp -r settings-effective/skills/settings-effective ~/.agents/skills/          # Codex, Cline, Zed, Warp (universal)
+cp -r settings-effective/skills/settings-effective ~/.cursor/skills/          # Cursor
+cp -r settings-effective/skills/settings-effective ~/.gemini/skills/          # Gemini CLI
+cp -r settings-effective/skills/settings-effective ~/.copilot/skills/         # GitHub Copilot
+cp -r settings-effective/skills/settings-effective ~/.config/opencode/skills/ # OpenCode
 ```
 
 ## Usage
 
-### From Claude
+### From your agent
 
 Say what you'd naturally say — "why is my model setting ignored?", "why does it still ask me about `npm test`?", "which hooks are actually running?", "where do I put `autoMode`?" — or type `/settings-effective`. Claude runs it from the project you're in, answers the question about your key first, then the findings that touch it. After Claude edits a settings file itself, it reruns with `--key` to confirm the edit landed where it applies.
 
 ### As a CLI
 
-Stdlib-only Python, nothing in it depends on Claude:
+Stdlib-only Python, nothing in it depends on any particular agent (the header's `host` line says which one you ran it from):
 
 ```bash
 python ~/.claude/skills/settings-effective/scripts/effective.py
@@ -122,6 +130,8 @@ The same way the [docs](https://code.claude.com/docs/en/settings#settings-preced
 `/status` lists which files loaded. `/permissions` and `/hooks` show and edit their slice. `/config` writes user-level keys. `claude doctor` reports dropped files. None of them show a merged key with its source or tell you a key is somewhere it can't apply. [`skill-rollcall`](https://github.com/Londopy/skill-rollcall) does the same job for skills.
 
 ## What it cannot do
+
+- **It reads Claude Code's settings only.** Codex's `config.toml` layers, Cursor's settings and Gemini's `settings.json` are different merges; under those hosts the header says so. Their MCP servers and skills are covered by [mcp-rollcall](https://github.com/Londopy/mcp-rollcall) and [skill-rollcall](https://github.com/Londopy/skill-rollcall).
 
 - **It reads files, not the running harness.** Managed policy delivered by MDM or the claude.ai console rather than a file isn't visible here; `/status` is the authority for that.
 - **Merge rules come from the docs, not the source.** A key with bespoke merging the docs don't describe is shown per leaf. `modelSettings` is resolved per model by the harness.

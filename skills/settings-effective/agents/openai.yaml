@@ -1,0 +1,5 @@
+# Optional Codex / ChatGPT metadata (developers.openai.com/codex/skills). Other hosts ignore it.
+interface:
+  display_name: "Claude Code settings, effective"
+  short_description: "The merged Claude Code settings, and which file decided each key"
+  default_prompt: "Show my effective Claude Code settings and why a key is not applying."

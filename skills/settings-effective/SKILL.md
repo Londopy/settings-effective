@@ -1,6 +1,11 @@
 ---
 name: settings-effective
-description: Show the merged Claude Code settings actually in effect and which file decided each key - managed policy, --settings, .claude/settings.local.json, .claude/settings.json, ~/.claude/settings.json and ~/.claude.json - and name the reasons a setting is not applying. Use this whenever the user says a setting isn't working or isn't taking effect, asks why they are still being prompted for a tool they allowed, asks which settings file wins or where a value is coming from, asks what a settings key does or where it goes, wants their settings files checked for typos or keys in the wrong file, asks whether a project is trusted, or wants to see all their hooks, permission rules or env in one place. Also use it after you edit any settings.json yourself, to confirm the key landed where it applies.
+description: Show the merged Claude Code settings actually in effect and which file decided each key - managed policy, --settings, .claude/settings.local.json, .claude/settings.json, ~/.claude/settings.json and ~/.claude.json - and name the reasons a setting is not applying. Runs from any agent; it inspects Claude Code's files. Use this whenever the user says a Claude Code setting isn't working or isn't taking effect, asks why they are still being prompted for a tool they allowed, asks which settings file wins or where a value is coming from, asks what a settings key does or where it goes, wants their settings files checked for typos or keys in the wrong file, asks whether a project is trusted, or wants to see all their hooks, permission rules or env in one place. Also use it after you edit any settings.json yourself, to confirm the key landed where it applies.
+license: MIT
+compatibility: Requires Python 3.10+. Read-only. Inspects Claude Code settings; runs from any Agent Skills host.
+metadata:
+  author: Londopy
+  version: "1.1.0"
 ---
 
 # settings-effective
@@ -14,10 +19,22 @@ project value overriding the user value you just edited, an `allow` rule losing 
 skipped whole. This skill prints the merged result with provenance and lists those
 reasons.
 
-The script is at `scripts/effective.py` next to this file (installed as a skill that is
-`~/.claude/skills/settings-effective/scripts/effective.py`). Stdlib-only and read-only,
-always. It carries the docs' settings index (231 keys with the scope each may be set
-from); the date is printed in the header and `docs/update_index.py` refreshes it.
+The script is `scripts/effective.py` next to this file - run it from wherever this skill
+was installed (`~/.claude/skills/settings-effective/`, `~/.agents/skills/settings-effective/`,
+`~/.cursor/skills/...`, or a project's `.agents/skills/`). Stdlib-only Python 3.10+ and
+read-only, always. It carries the docs' settings index (231 keys with the scope each may
+be set from); the date is printed in the header and `docs/update_index.py` refreshes it.
+
+## Which host
+
+The subject is always Claude Code's settings: that is the merge with six layers and
+scope rules worth making legible. You can run it from Codex, Cursor or Gemini CLI - a
+machine with several agents still has one Claude Code configuration to debug - and the
+header's `host` line then says which agent you are and that its own config
+(`~/.codex/config.toml`, Cursor's settings, `~/.gemini/settings.json`) is a different
+merge this tool does not read. For those hosts' MCP servers use `mcp-rollcall`; for
+their skills, `skill-rollcall`. If the user asks about a Codex or Cursor *setting*, say
+so plainly rather than running this.
 
 ## Pick the mode from what the user asked
 
@@ -74,7 +91,8 @@ file that cannot set it. `skill-rollcall` does the same job for skills.
 
 It reads files; it does not ask the running harness what it loaded, so a managed
 source delivered by MDM or the claude.ai console rather than a file is not seen, and
-`/status` is the authority there. Its merge rules come from the docs, not the harness
+`/status` is the authority there. It does not resolve any other agent's settings -
+Codex's `config.toml` layers, Cursor's or Gemini's - only Claude Code's. Its merge rules come from the docs, not the harness
 source, so a key with bespoke merging the docs do not describe may be shown per-leaf
 when the harness treats it whole. `modelSettings` is resolved per model by the harness
 and shown per leaf here. And the index is a snapshot: a key newer than its date shows

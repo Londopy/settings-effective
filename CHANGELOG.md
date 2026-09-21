@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.1.0 - 2026-09-21
+
+- Runs from any Agent Skills host. The header gains a `host` line naming the agent it
+  ran under (from `CLAUDECODE`, `CODEX_SANDBOX`, `CURSOR_AGENT`, `GEMINI_CLI`) and, under
+  Codex, Cursor or Gemini, saying that their own config is a different merge this tool
+  does not read. The subject stays Claude Code's settings. JSON gains `host`, `host_note`.
+- SKILL.md rewritten with a "Which host" section and the Agent Skills spec frontmatter
+  (`license`, `compatibility`, `metadata`); `agents/openai.yaml` for Codex / ChatGPT UI
+  metadata; README install matrix for Codex, Cursor, Gemini CLI, Copilot and OpenCode.
+
 ## 1.0.0 - 2026-09-19
 
 Initial release.

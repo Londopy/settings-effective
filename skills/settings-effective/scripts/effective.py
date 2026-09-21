@@ -15,7 +15,9 @@ names the reasons a key you set is not the one in effect.
     python effective.py --strict              exit 1 on any error-level finding
     python effective.py --json                everything, machine-readable
 
-Stdlib only. Read-only, always.
+Stdlib only. Read-only, always. Inspects Claude Code's settings from whichever agent
+runs it; other hosts' own config (Codex config.toml, Cursor, Gemini settings.json) is
+a different merge and is not read here.
 """
 from __future__ import annotations
 
@@ -323,9 +325,27 @@ class Finding:
     message: str
 
 
+# The agent this ran under, from the variables hosts set in the shells they spawn. Only
+# informational: the settings inspected are always Claude Code's.
+HOST_MARKERS = {"claude": ["CLAUDECODE"], "codex": ["CODEX_SANDBOX", "CODEX_SANDBOX_NETWORK_DISABLED"],
+                "cursor": ["CURSOR_AGENT"], "gemini": ["GEMINI_CLI"]}
+HOST_OWN_CONFIG = {"codex": "~/.codex/config.toml and .codex/config.toml", "cursor": "Cursor's settings and .cursor/",
+                   "gemini": "~/.gemini/settings.json and .gemini/settings.json"}
+
+
+def detect_host() -> tuple[str | None, str | None]:
+    for key, vars_ in HOST_MARKERS.items():
+        for var in vars_:
+            if os.environ.get(var):
+                return key, var
+    return None, None
+
+
 @dataclass
 class Report:
     project: str
+    host: str = ""                                   # agent this ran under, when detectable
+    host_note: str = ""
     layers: list[Layer] = field(default_factory=list)
     trusted: bool | None = None
     legacy_allowed_tools: list[str] = field(default_factory=list)
@@ -634,6 +654,8 @@ def short(v: Any, width: int) -> str:
 def render(rep: Report, a) -> None:
     W = 200 if a.full else 48
     print(f"settings-effective  {rep.project}")
+    if rep.host:
+        print(f"  {'host':15} {rep.host:8} {rep.host_note}")
     print()
     for l in sorted(rep.layers, key=lambda l: RANK[l.name]):
         state = "loaded" if l.present else ("SKIPPED" if l.error else "absent")
@@ -720,6 +742,12 @@ def build(a) -> Report:
     claude_home = Path(a.claude_home)
     proj = project_dir(Path(a.project))
     rep = Report(project=str(proj))
+    host, var = detect_host()
+    if host:
+        rep.host = host
+        rep.host_note = (f"({var} set) reading Claude Code's settings" +
+                         (f"; {HOST_OWN_CONFIG[host]} are {host}'s own config and a different merge, not shown here"
+                          if host in HOST_OWN_CONFIG else ""))
     managed_dir = Path(a.managed_dir) if a.managed_dir else MANAGED_DIRS.get(sys.platform, MANAGED_DIRS["linux"])
     glayer, raw_global = global_layer(Path(a.claude_json) if a.claude_json else Path.home() / ".claude.json")
     rep.layers = [
