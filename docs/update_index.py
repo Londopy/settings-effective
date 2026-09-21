@@ -69,10 +69,16 @@ def main() -> int:
     b, e = src.index(BEGIN), src.index(END) + len(END)
     old = src[b:e]
     old_keys = set(re.findall(r"^    '([^']+)':", old, re.M))
-    new = render(index, dt.date.today().isoformat())
-    SCRIPT.write_text(src[:b] + new + src[e:], encoding="utf-8")
+    # the date says when the index last *changed*, so an unchanged index keeps it and a
+    # rerun on another day (CI checks the snapshot still parses) is a no-op
+    m = re.search(r"^INDEX_DATE = '([^']+)'", old, re.M)
+    old_date = m.group(1) if m else None
+    new = render(index, old_date or dt.date.today().isoformat())
+    if new != old:
+        new = render(index, dt.date.today().isoformat())
+    SCRIPT.write_text(src[:b] + new + src[e:], encoding="utf-8", newline="\n")
     added, removed = sorted(set(index) - old_keys), sorted(old_keys - set(index))
-    print(f"{len(index)} keys; +{len(added)} -{len(removed)}")
+    print(f"{len(index)} keys; +{len(added)} -{len(removed)}" + ("" if new != old else " (unchanged)"))
     for k in added:
         print(f"  + {k}")
     for k in removed:
